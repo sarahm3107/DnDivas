@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>D&D Character Creator – Pink Theme</title>
+<style>
+  :root {
+    --pink-bg: #2b1d29;
+    --pink-dark: #3d253b;
+    --pink-accent: #ff6fae;
+    --pink-light: #ffb6d9;
+  }
+  body {
+    background: var(--pink-bg);
+    color: var(--pink-light);
+    font-family: "Segoe UI", sans-serif;
+    padding: 20px;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1, h2 { text-align: center; color: var(--pink-accent); }
+  .section { margin-bottom: 20px; }
+
+  .option {
+    background: var(--pink-dark);
+    color: var(--pink-light);
+    border: 1px solid var(--pink-accent);
+    padding: 6px 12px;
+    margin: 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-block;
+    transition: background 0.2s;
+  }
+  .option:hover { background: #4a2d47; }
+  .option.selected { background: var(--pink-accent); color: #fff; }
+
+  textarea, input[type="text"], input[type="number"] {
+    width: 100%; padding: 6px; margin: 4px 0;
+    border-radius: 6px; border: 1px solid var(--pink-accent);
+    background: var(--pink-dark); color: var(--pink-light);
+  }
+  button.action {
+    background: var(--pink-accent);
+    color: #fff;
+    padding: 10px 16px;
+    margin: 6px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+  }
+  button.action:hover { background: #ff88bb; }
+
+  .preview-img {
+    max-width: 100%;
+    border-radius: 12px;
+    margin: 10px 0;
+    border: 2px solid var(--pink-accent);
+  }
+  .desc-box {
+    background: var(--pink-dark);
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 6px;
+    font-size: 0.95rem;
+    border: 1px solid var(--pink-accent);
+  }
+
+  .inline-inputs { display: flex; gap: 20px; flex-wrap: wrap; }
+  .inline-inputs label { flex: 1; }
+  .name-row { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end; }
+
+  /* Fancy image-upload box */
+  .upload-area {
+    border: 2px dashed var(--pink-accent);
+    border-radius: 12px;
+    background: var(--pink-dark);
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .upload-area:hover {
+    background: #4a2d47;
+    border-color: #ff88bb;
+  }
+  .upload-area input { display: none; }
+  .upload-area .upload-text {
+    color: var(--pink-light);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .upload-area img {
+    max-width: 140px;
+    max-height: 140px;
+    margin-top: 12px;
+    border-radius: 10px;
+    border: 2px solid var(--pink-accent);
+    object-fit: cover;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>💖 D&D Character Creator 💖</h1>
+
+  <!-- Character basics -->
+  <div class="section">
+    <h2>Character Basics</h2>
+    <div class="name-row">
+      <label style="flex:1">
+        Name:
+        <input type="text" id="char-name" />
+      </label>
+      <label style="flex:1">
+        Character Image:
+        <div class="upload-area" id="upload-box">
+          <span class="upload-text">Click or drag an image here</span>
+          <input type="file" id="char-img" accept="image/*"/>
+          <img id="char-img-preview" style="display:none"/>
+        </div>
+      </label>
+    </div>
+    <div class="inline-inputs">
+      <label>Age:<input type="number" id="char-age" /></label>
+      <label>Gender:<input type="text" id="char-gender" placeholder="e.g., Female, Male, Non-binary"/></label>
+    </div>
+  </div>
+
+  <!-- Races -->
+  <div class="section">
+    <h2>Select Race</h2>
+    <div id="races"></div>
+    <img id="race-image" class="preview-img" style="display:none"/>
+    <div id="race-desc" class="desc-box" style="display:none"></div>
+  </div>
+
+  <!-- Classes -->
+  <div class="section">
+    <h2>Select Class</h2>
+    <div id="classes"></div>
+    <div id="class-desc" class="desc-box" style="display:none"></div>
+  </div>
+
+  <!-- Backgrounds -->
+  <div class="section">
+    <h2>Select Background</h2>
+    <div id="backgrounds"></div>
+    <div id="background-desc" class="desc-box" style="display:none"></div>
+  </div>
+
+  <!-- Backstory -->
+  <div class="section">
+    <h2>Backstory</h2>
+    <textarea id="char-story" rows="4" placeholder="Write your character's tale..."></textarea>
+  </div>
+
+  <div class="section" style="text-align:center">
+    <button class="action" id="create-btn">Create Character</button>
+    <button class="action" id="export-pdf">Export to PDF</button>
+    <button class="action" id="reset">Reset</button>
+  </div>
+
+  <h2>Preview</h2>
+  <p><strong>Name:</strong> <span id="preview-name"></span></p>
+  <p><strong>Age:</strong> <span id="preview-age"></span></p>
+  <p><strong>Gender:</strong> <span id="preview-gender"></span></p>
+  <p><strong>Backstory:</strong> <span id="preview-story"></span></p>
+  <p><strong>Race:</strong> <span id="preview-race"></span></p>
+  <p><strong>Class:</strong> <span id="preview-class"></span></p>
+  <p><strong>Background:</strong> <span id="preview-background"></span></p>
+  <img id="preview-char-img" class="upload-area img" style="display:none"/>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const RACES = {
+  "Human": { img: "https://cdn.pixabay.com/photo/2017/09/22/19/31/fantasy-2772830_1280.jpg", desc: "Versatile and ambitious, humans adapt to any path and thrive in every environment." },
+  "Elf": { img: "https://cdn.pixabay.com/photo/2020/02/10/19/48/elf-female-4836414_1280.jpg", desc: "Graceful, long-lived, and attuned to magic and nature, elves are masters of archery and spellcraft." },
+  "Dwarf": { img: "https://cdn.pixabay.com/photo/2016/11/19/14/00/dwarf-1839511_1280.jpg", desc: "Stout and sturdy, dwarves value honor, tradition, and masterful craftsmanship." },
+  "Halfling": { img: "https://cdn.pixabay.com/photo/2020/06/17/20/52/hobbit-5309891_1280.jpg", desc: "Small and clever, halflings are cheerful, lucky, and resourceful." },
+  "Gnome": { img: "https://cdn.pixabay.com/photo/2019/06/20/18/06/gnome-4288654_1280.jpg", desc: "Inventive and curious, gnomes are natural tinkerers with boundless energy." },
+  "Half-Elf": { img: "https://cdn.pixabay.com/photo/2020/06/16/10/08/elf-5306080_1280.jpg", desc: "Blending human versatility and elven grace, half-elves walk between two worlds." },
+  "Half-Orc": { img: "https://cdn.pixabay.com/photo/2016/03/26/22/13/orc-1289315_1280.jpg", desc: "Powerful and resilient, half-orcs channel inner strength and fierce determination." },
+  "Dragonborn": { img: "https://cdn.pixabay.com/photo/2014/11/28/01/01/dragon-548880_1280.jpg", desc: "Proud draconic descendants, dragonborn command elemental breath and mighty presence." },
+  "Tiefling": { img: "https://cdn.pixabay.com/photo/2020/02/19/20/18/fantasy-4860203_1280.jpg", desc: "Marked by infernal heritage, tieflings wield natural charisma and an otherworldly air." }
+};
+
+const CLASSES = {
+  "Fighter": "Masters of martial combat, skilled with every weapon and armor type.",
+  "Wizard": "Arcane scholars wielding potent spells and boundless magical knowledge.",
+  "Rogue": "Stealthy tricksters and deadly assassins who strike from the shadows.",
+  "Cleric": "Devout agents of the gods, wielding divine magic to heal or smite.",
+  "Ranger": "Hunters and trackers who blend martial skill with primal magic.",
+  "Paladin": "Holy warriors bound by oaths to uphold justice and righteousness.",
+  "Warlock": "Seekers of arcane power through pacts with mysterious entities.",
+  "Bard": "Charming storytellers and versatile spellcasters who inspire allies.",
+  "Monk": "Masters of martial arts and spiritual discipline, swift and deadly."
+};
+
+const BACKGROUNDS = {
+  "Noble": "Raised in wealth and privilege, accustomed to influence and courtly intrigue.",
+  "Soldier": "A hardened veteran trained in combat tactics and battlefield strategy.",
+  "Criminal": "Streetwise and cunning, with a network of shady contacts.",
+  "Sage": "A lifelong seeker of knowledge and keeper of ancient secrets.",
+  "Hermit": "Years of isolation have brought spiritual insight and hidden revelations.",
+  "Folk Hero": "Champion of the people, known for bravery and selflessness.",
+  "Acolyte": "Dedicated servant of a deity or religious order.",
+  "Entertainer": "A performer who thrives on applause and crowd-pleasing antics.",
+  "Guild Artisan": "A skilled tradesperson connected to influential merchant guilds."
+};
+
+const state = { race:null, cls:null, bg:null };
+
+function populateOptions(containerId, data, isObject) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  Object.keys(data).forEach(key => {
+    const btn = document.createElement('button');
+    btn.textContent = key;
+    btn.className = 'option';
+    btn.onclick = () => {
+      if(containerId==='races'){
+        state.race = key;
+        document.getElementById('race-desc').textContent = data[key].desc;
+        document.getElementById('race-desc').style.display = 'block';
+        document.getElementById('race-image').src = data[key].img;
+        document.getElementById('race-image').style.display = 'block';
+      } else if(containerId==='classes'){
+        state.cls = key;
+        document.getElementById('class-desc').textContent = data[key];
+        document.getElementById('class-desc').style.display = 'block';
+      } else {
+        state.bg = key;
+        document.getElementById('background-desc').textContent = data[key];
+        document.getElementById('background-desc').style.display = 'block';
+      }
+      document.querySelectorAll('#'+containerId+' .option').forEach(o=>o.classList.remove('selected'));
+      btn.classList.add('selected');
+      updatePreview();
+    };
+    container.appendChild(btn);
+  });
+}
+
+function updatePreview(){
+  document.getElementById('preview-name').textContent = document.getElementById('char-name').value;
+  document.getElementById('preview-age').textContent = document.getElementById('char-age').value;
+  document.getElementById('preview-gender').textContent = document.getElementById('char-gender').value;
+  document.getElementById('preview-story').textContent = document.getElementById('char-story').value;
+  document.getElementById('preview-race').textContent = state.race||'';
+  document.getElementById('preview-class').textContent = state.cls||'';
+  document.getElementById('preview-background').textContent = state.bg||'';
+}
+
+['char-name','char-age','char-gender','char-story'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', updatePreview);
+});
+
+// Image upload & drag-drop
+const uploadBox = document.getElementById('upload-box');
+const fileInput = document.getElementById('char-img');
+const previewImg = document.getElementById('char-img-preview');
+
+uploadBox.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    previewImg.src = ev.target.result;
+    previewImg.style.display = 'block';
+    document.getElementById('preview-char-img').src = ev.target.result;
+    document.getElementById('preview-char-img').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+});
+uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.style.background = '#4a2d47'; });
+uploadBox.addEventListener('dragleave', () => { uploadBox.style.background = 'var(--pink-dark)'; });
+uploadBox.addEventListener('drop', e => {
+  e.preventDefault();
+  fileInput.files = e.dataTransfer.files;
+  fileInput.dispatchEvent(new Event('change'));
+  uploadBox.style.background = 'var(--pink-dark)';
+});
+
+document.getElementById('create-btn').onclick = ()=>{
+  if(!state.race || !state.cls || !state.bg){
+    alert("Please choose race, class, and background.");
+    return;
+  }
+  alert("Character created!");
+};
+
+document.getElementById('reset').onclick = ()=> location.reload();
+
+document.getElementById('export-pdf').onclick = ()=>{
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFontSize(14);
+  doc.text(`Name: ${document.getElementById('char-name').value}`, 10, 20);
+  doc.text(`Age: ${document.getElementById('char-age').value}`, 10, 30);
+  doc.text(`Gender: ${document.getElementById('char-gender').value}`, 10, 40);
+  doc.text(`Race: ${state.race||''}`, 10, 50);
+  doc.text(`Class: ${state.cls||''}`, 10, 60);
+  doc.text(`Background: ${state.bg||''}`, 10, 70);
+  doc.text("Backstory:", 10, 80);
+  doc.text(document.getElementById('char-story').value, 10, 90);
+  doc.save("dnd-character.pdf");
+};
+
+// Populate all options
+populateOptions('races', RACES, true);
+populateOptions('classes', CLASSES, false);
+populateOptions('backgrounds', BACKGROUNDS, false);
+</script>
+</body>
+</html>
